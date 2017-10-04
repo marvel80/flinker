@@ -3,4 +3,35 @@
   <groupId>me.flinker</groupId>
   <artifactId>exp1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-core -->
+		<dependency>
+		    <groupId>org.apache.flink</groupId>
+		    <artifactId>flink-core</artifactId>
+		    <version>1.3.2</version>
+		</dependency>
+	
+		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-java -->
+		<dependency>
+		    <groupId>org.apache.flink</groupId>
+		    <artifactId>flink-java</artifactId>
+		    <version>1.3.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.flink/flink-streaming-java_2.11 -->
+		<dependency>
+		    <groupId>org.apache.flink</groupId>
+		    <artifactId>flink-streaming-java_2.11</artifactId>
+		    <version>1.3.2</version>
+		    <scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <version>1.16.18</version>
+		    <scope>provided</scope>
+		</dependency>
+
+	</dependencies>
 </project>
