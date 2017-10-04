@@ -1,5 +1,15 @@
 package me.flinker.more.samples;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.DataSet;
+import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.typeutils.TupleTypeInfo;
+import org.apache.flink.util.Collector;
+
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,12 +28,6 @@ package me.flinker.more.samples;
  * limitations under the License.
  */
 
-import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.util.Collector;
-
 /**
  * Implements the "WordCount" program that computes a simple word occurrence histogram
  * over some sample data
@@ -33,63 +37,45 @@ import org.apache.flink.util.Collector;
  * <ul>
  * <li>write a simple Flink program.
  * <li>use Tuple data types.
- * <li>write and use user-defined functions.
  * </ul>
  *
  */
 public class WordCount {
+	private static final String SAMPLE_TEXT = "demo demo demo of dataset API";
 
-	//
-	//	Program
-	//
-
-	public static void main(String[] args) throws Exception {
-
-		// set up the execution environment
+	public static void main(String[] args) {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+		DataSet<String> data = env.fromElements(SAMPLE_TEXT);
 
-		// get input data
-		DataSet<String> text = env.fromElements(
-				"To be, or not to be,--that is the question:--",
-				"Whether 'tis nobler in the mind to suffer",
-				"The slings and arrows of outrageous fortune",
-				"Or to take arms against a sea of troubles,"
-				);
+		@SuppressWarnings("unchecked")
+		DataSet<Tuple2<String, Integer>> trasnsformedData = data
+				/*
+				.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+					private static final long serialVersionUID = 1069293713093807126L;
 
-		DataSet<Tuple2<String, Integer>> counts =
-				// split up the lines in pairs (2-tuples) containing: (word,1)
-				text.flatMap(new LineSplitter())
-				// group by the tuple field "0" and sum up tuple field "1"
-				.groupBy(0)
-				.sum(1);
-
-		// execute and print result
-		counts.print();
-
-	}
-
-	//
-	// 	User Functions
-	//
-
-	/**
-	 * Implements the string tokenizer that splits sentences into words as a user-defined
-	 * FlatMapFunction. The function takes a line (String) and splits it into
-	 * multiple pairs in the form of "(word,1)" (Tuple2<String, Integer>).
-	 */
-	public static final class LineSplitter implements FlatMapFunction<String, Tuple2<String, Integer>> {
-
-		@Override
-		public void flatMap(String value, Collector<Tuple2<String, Integer>> out) {
-			// normalize and split the line
-			String[] tokens = value.toLowerCase().split("\\W+");
-
-			// emit the pairs
-			for (String token : tokens) {
-				if (token.length() > 0) {
-					out.collect(new Tuple2<String, Integer>(token, 1));
-				}
-			}
+					@Override
+					public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception {
+						String[] tokens = value.trim().toLowerCase().split("\\W+");
+						for (String token : tokens) {
+							out.collect(new Tuple2<String, Integer>(token, 1));
+						}
+					}
+				})*/
+		
+				//functionally,same as above but fancy. why not ?? its JAVA8 :P
+				.flatMap((String value, Collector<Tuple2<String, Integer>> out) -> {
+					List<String> tokens = Arrays.asList(value.trim().toLowerCase().split("\\W+"));
+					tokens.forEach(token -> out.collect(new Tuple2<String, Integer>(token, 1)));
+				})
+				.returns(new TupleTypeInfo(TypeInformation.of(String.class), TypeInformation.of(Integer.class)))
+				.groupBy(0).sum(1);
+		
+		
+		try {
+			trasnsformedData.print();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
+
 }
