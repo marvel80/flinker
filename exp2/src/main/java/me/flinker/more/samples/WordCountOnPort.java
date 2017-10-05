@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 
 public class WordCountOnPort {
 
-	private static final String BROKER = "localhost:9092";
+	private static final String BROKER = "localhost:9092"; 
 	private static final String TOPIC = "test";
 	
 	public static void main(String[] args) {
