@@ -40,14 +40,17 @@ public class WordCountOnPort {
 		//counts.print().setParallelism(1);
 		
 		// send to Kafka topic --> test
-		counts.map(new MapFunction<WordCountOnPort.WordWithCount, String>() {
+		counts
+		.map(value-> value.toString())
+		/*.map(new MapFunction<WordCountOnPort.WordWithCount, String>() {
 			private static final long serialVersionUID = 5073431879636192442L;
 
 			@Override
 			public String map(WordWithCount value) throws Exception {
 				return value.toString();
 			}
-		}).addSink(new FlinkKafkaProducer08<String>("localhost:9092", "test", new SimpleStringSchema()));
+		})*/
+		.addSink(new FlinkKafkaProducer08<String>("localhost:9092", "test", new SimpleStringSchema()));
 		
 		try {
 			env.execute("wordcount");
