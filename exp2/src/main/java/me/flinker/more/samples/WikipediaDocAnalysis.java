@@ -2,6 +2,7 @@ package me.flinker.more.samples;
 
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FoldFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -11,8 +12,10 @@ import org.apache.flink.streaming.api.datastream.WindowedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditEvent;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditsSource;
+import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 
 public class WikipediaDocAnalysis {
 
@@ -25,11 +28,22 @@ public class WikipediaDocAnalysis {
 		DataStream<WikipediaEditEvent> edit = env.addSource(new WikipediaEditsSource());
 
 		KeyedStream<WikipediaEditEvent, String> keyEdits = edit.keyBy(value -> value.getUser());
-		WindowedStream<WikipediaEditEvent, String, TimeWindow> keyedWindowStream = keyEdits
-				.timeWindow(Time.seconds(10));
+		WindowedStream<WikipediaEditEvent, String, TimeWindow> keyedWindowStream = keyEdits.timeWindow(Time.seconds(3));
 		DataStream<Tuple2<String, Long>> editsPerUser = getEditsPerUserViaAggregation(keyedWindowStream);
 
+		// earlier used to just print
 		editsPerUser.print();
+
+		// now send to Kafka
+		/*editsPerUser.map(new MapFunction<Tuple2<String, Long>, String>() {
+			private static final long serialVersionUID = -3791157493663901971L;
+
+			@Override
+			public String map(Tuple2<String, Long> value) throws Exception {
+				return value.toString();
+			}
+		}).addSink(new FlinkKafkaProducer08<>("localhost:9092", "test", new SimpleStringSchema()));*/
+
 		env.execute();
 	}
 
