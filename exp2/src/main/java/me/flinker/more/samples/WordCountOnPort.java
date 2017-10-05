@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 
 public class WordCountOnPort {
 
+	private static final String BROKER = "localhost:9092";
+	private static final String TOPIC = "test";
+	
 	public static void main(String[] args) {
 		final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 		DataStream<String> text = env.socketTextStream("localhost", 12345, "\n");
@@ -49,7 +52,7 @@ public class WordCountOnPort {
 				return value.toString();
 			}
 		})*/
-		.addSink(new FlinkKafkaProducer08<String>("localhost:9092", "test", new SimpleStringSchema()));
+		.addSink(new FlinkKafkaProducer08<String>(BROKER, TOPIC, new SimpleStringSchema()));
 		
 		try {
 			env.execute("wordcount");
