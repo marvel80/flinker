@@ -3,6 +3,7 @@ package me.flinker.more.samples;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -67,9 +68,11 @@ public class WordCount {
 					List<String> tokens = Arrays.asList(value.trim().toLowerCase().split("\\W+"));
 					tokens.forEach(token -> out.collect(new Tuple2<String, Integer>(token, 1)));
 				})
-				.returns(new TupleTypeInfo(TypeInformation.of(String.class), TypeInformation.of(Integer.class)))
+				.returns(TypeInformation
+						// works with both : TupleTypeInfo or TypeHint
+						//new TupleTypeInfo(TypeInformation.of(String.class), TypeInformation.of(Integer.class)))
+						.of( new TypeHint<Tuple2<String, Integer>>() {}))
 				.groupBy(0).sum(1);
-		
 		
 		try {
 			trasnsformedData.print();
