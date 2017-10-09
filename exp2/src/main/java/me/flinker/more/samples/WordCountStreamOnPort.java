@@ -14,7 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-public class WordCountOnPort {
+public class WordCountStreamOnPort {
 
 	private static final String BROKER = "localhost:9092"; 
 	private static final String TOPIC = "test";

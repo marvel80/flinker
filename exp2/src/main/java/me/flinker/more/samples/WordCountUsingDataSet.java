@@ -41,7 +41,7 @@ import org.apache.flink.util.Collector;
  * </ul>
  *
  */
-public class WordCount {
+public class WordCountUsingDataSet {
 	private static final String SAMPLE_TEXT = "demo demo demo of dataset API";
 
 	public static void main(String[] args) {
